@@ -4,25 +4,50 @@ import math
 
 pygame.init()
 screen = pygame.display.set_mode((1920, 1080))
-pygame.display.set_caption('Runner')
+pygame.display.set_caption('Bloons TD 6')
 clock = pygame.time.Clock()
 
 # Load background
-background = pygame.image.load("images/maps/MonkeyMeadow.png")
+map = pygame.image.load("images/maps/MonkeyMeadow.png")
+
+path = [
+    (-49, 400),
+    (800, 400),
+    (800, 150),
+    (525, 150),
+    (525, 815),
+    (250, 815),
+    (250, 575),
+    (1025, 575),
+    (1050, 315),
+    (1235, 315),
+    (1220, 730),
+    (730, 740),
+    (730, 1080),
+]
 
 class RedBloon:
-    def __init__(self, image_path, x, y, speed):
+    def __init__(self, image_path, x, y, speed, path):
         self.image = pygame.image.load(image_path)
         self.x = x
         self.y = y
         self.speed = speed
+        self.path = path
+        self.current_point = 0 
 
-    def move_toward(self, target_x, target_y):
+    def follow_path(self):
+        if self.current_point >= len(self.path):
+            return
+
+        target_x, target_y = self.path[self.current_point]
         dx = target_x - self.x
         dy = target_y - self.y
         distance = math.hypot(dx, dy)
 
-        if distance > 1:
+        if distance < self.speed:
+            self.x, self.y = target_x, target_y
+            self.current_point += 1
+        else:
             dx /= distance
             dy /= distance
             self.x += dx * self.speed
@@ -31,7 +56,9 @@ class RedBloon:
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
 
-bloon = RedBloon("images/bloons/redbloon.png", 100, 100, speed=5)
+# Start at the first path point
+start_x, start_y = path[0]
+bloon = RedBloon("images/bloons/redbloon.png", start_x, start_y, speed=2, path=path)
 
 # Main game loop
 while True:
@@ -40,14 +67,9 @@ while True:
             pygame.quit()
             exit()
 
-    # Get mouse position
-    mouse_x, mouse_y = pygame.mouse.get_pos()
+    bloon.follow_path()
 
-    # Move the bloon toward the mouse
-    bloon.move_toward(mouse_x, mouse_y)
-
-    # Draw everything
-    screen.blit(background, (0, 0))
+    screen.blit(map, (0, 0))
     bloon.draw(screen)
 
     pygame.display.update()
