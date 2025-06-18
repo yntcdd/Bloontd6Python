@@ -7,7 +7,7 @@ screen = pygame.display.set_mode((1920, 1080))
 pygame.display.set_caption('Runner')
 clock = pygame.time.Clock()
 
-# Load background
+# Load backgr ound
 background = pygame.image.load("images/maps/MonkeyMeadow.png")
 
 class RedBloon:
@@ -22,7 +22,7 @@ class RedBloon:
         dy = target_y - self.y
         distance = math.hypot(dx, dy)
 
-        if distance > 1:  # Prevent jitter when it's already close
+        if distance > 1:
             dx /= distance
             dy /= distance
             self.x += dx * self.speed
@@ -31,8 +31,6 @@ class RedBloon:
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
 
-
-# Create a red bloon instance
 bloon = RedBloon("images/bloons/redbloon.png", 100, 100, speed=5)
 
 # Main game loop
