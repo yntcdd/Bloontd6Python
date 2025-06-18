@@ -7,7 +7,7 @@ screen = pygame.display.set_mode((1920, 1080))
 pygame.display.set_caption('Runner')
 clock = pygame.time.Clock()
 
-# Load backgr ound
+# Load background
 background = pygame.image.load("images/maps/MonkeyMeadow.png")
 
 class RedBloon:
