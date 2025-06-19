@@ -7,13 +7,38 @@ screen = pygame.display.set_mode((1920, 1080))
 pygame.display.set_caption('Bloons TD 6')
 clock = pygame.time.Clock()
 
+font = pygame.font.Font("LuckiestGuy-Regular.ttf", 60)
 
 # Colors
 brown = (193,152,95)
+brown2 = (148, 99, 54)
+brown3 = (159, 120, 67)
 darkbrown = (122,92,59)
+darkbrown2 = (136, 89, 48)
+darkbrown3 = (151, 112, 61)
+white = (255, 255, 255)
+black = (0, 0, 0)
 
 # Load background
 map = pygame.image.load("images/maps/MonkeyMeadow.png")
+
+upgradebefore = pygame.image.load("images/gameui/upgrades.png")
+upgrades = pygame.transform.scale(upgradebefore, (211, 74))
+
+DartMonkeyShopbefore = pygame.image.load("images/gameui/DartMonkeyShop.png")
+DartMonkeyShop = pygame.transform.scale(DartMonkeyShopbefore, (108, 140))
+
+def get_cut_corner_rect_points(x, y, w, h, cut):
+    return [
+        (x + cut, y),
+        (x + w - cut, y),
+        (x + w, y + cut),
+        (x + w, y + h - cut),
+        (x + w - cut, y + h),
+        (x + cut, y + h),
+        (x, y + h - cut),
+        (x, y + cut),
+    ]
 
 path = [
     (-49, 400),
@@ -80,6 +105,20 @@ while True:
     pygame.draw.rect(screen, darkbrown, pygame.Rect(1673, -10, 260, 1100).inflate(5 * 2, 5 * 2), border_radius=35)
 
     pygame.draw.rect(screen, brown, pygame.Rect(1673, -10, 260, 1100), border_radius=30)
+
+    screen.blit(upgrades, (1695, 10))
+
+    pygame.draw.polygon(screen, darkbrown2, get_cut_corner_rect_points(1685, 95, 220, 60, 5))
+    pygame.draw.polygon(screen, brown2, get_cut_corner_rect_points(1695, 105, 200, 40, 5))
+
+    pygame.draw.polygon(screen, darkbrown3, get_cut_corner_rect_points(1680, 166, 232, 750, 8))
+    pygame.draw.rect(screen, brown3, pygame.Rect(1686, 172, 220, 738))
+
+    screen.blit(DartMonkeyShop, (1685, 170))
+    screen.blit(DartMonkeyShop, (1799, 170))
+
+    
+
 
     pygame.display.update()
     clock.tick(60)
