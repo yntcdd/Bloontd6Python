@@ -7,6 +7,11 @@ screen = pygame.display.set_mode((1920, 1080))
 pygame.display.set_caption('Bloons TD 6')
 clock = pygame.time.Clock()
 
+
+# Colors
+brown = (193,152,95)
+darkbrown = (122,92,59)
+
 # Load background
 map = pygame.image.load("images/maps/MonkeyMeadow.png")
 
@@ -71,6 +76,10 @@ while True:
 
     screen.blit(map, (0, 0))
     bloon.draw(screen)
+
+    pygame.draw.rect(screen, darkbrown, pygame.Rect(1673, -10, 260, 1100).inflate(5 * 2, 5 * 2), border_radius=35)
+
+    pygame.draw.rect(screen, brown, pygame.Rect(1673, -10, 260, 1100), border_radius=30)
 
     pygame.display.update()
     clock.tick(60)
