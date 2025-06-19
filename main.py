@@ -9,6 +9,9 @@ clock = pygame.time.Clock()
 
 font = pygame.font.Font("LuckiestGuy-Regular.ttf", 60)
 
+overlay = pygame.Surface((108, 140), pygame.SRCALPHA)
+overlay.fill((0, 0, 0, 50))
+
 # Colors
 brown = (193,152,95)
 brown2 = (148, 99, 54)
@@ -19,6 +22,9 @@ darkbrown3 = (151, 112, 61)
 white = (255, 255, 255)
 black = (0, 0, 0)
 
+tower_selected = ""
+place_tower = ""
+
 # Load background
 map = pygame.image.load("images/maps/MonkeyMeadow.png")
 
@@ -27,6 +33,11 @@ upgrades = pygame.transform.scale(upgradebefore, (211, 74))
 
 DartMonkeyShopbefore = pygame.image.load("images/gameui/DartMonkeyShop.png")
 DartMonkeyShop = pygame.transform.scale(DartMonkeyShopbefore, (108, 140))
+DartMonkeyShopSelectbefore = pygame.image.load("images/gameui/DartMonkeyShopSelect.png")
+DartMonkeyShopSelect = pygame.transform.scale(DartMonkeyShopSelectbefore, (108, 140))
+DartMonkeyShop_rect = pygame.Rect(1799, 170, 108, 140)
+DartMonkeybefore = pygame.image.load("images/towers/DartMonkey.png")
+DartMonkey = pygame.transform.scale(DartMonkeybefore, (97, 129))
 
 def get_cut_corner_rect_points(x, y, w, h, cut):
     return [
@@ -96,6 +107,15 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+            
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if place_tower == "Dart Monkey":
+                print("hi")
+            if DartMonkeyShop_rect.collidepoint(event.pos):
+                tower_selected = "Dart Monkey"
+                place_tower = "Dart Monkey"
+    
+    mouse_pos = pygame.mouse.get_pos()
 
     bloon.follow_path()
 
@@ -110,12 +130,23 @@ while True:
 
     pygame.draw.polygon(screen, darkbrown2, get_cut_corner_rect_points(1685, 95, 220, 60, 5))
     pygame.draw.polygon(screen, brown2, get_cut_corner_rect_points(1695, 105, 200, 40, 5))
+    
+    font = pygame.font.Font("LuckiestGuy-Regular.ttf", 25)
+    screen.blit(font.render(tower_selected, True, (255, 255, 255)), (1720, 115))
 
     pygame.draw.polygon(screen, darkbrown3, get_cut_corner_rect_points(1680, 166, 232, 750, 8))
     pygame.draw.rect(screen, brown3, pygame.Rect(1686, 172, 220, 738))
 
     screen.blit(DartMonkeyShop, (1685, 170))
-    screen.blit(DartMonkeyShop, (1799, 170))
+    
+    if tower_selected == "Dart Monkey":
+        screen.blit(DartMonkeyShopSelect, (1801, 171))
+    else:
+        if DartMonkeyShop_rect.collidepoint(mouse_pos):
+            screen.blit(DartMonkeyShop, (1799, 170))
+            screen.blit(overlay, (1799, 170))
+        else: 
+            screen.blit(DartMonkeyShop, (1799, 170))
 
     
 
