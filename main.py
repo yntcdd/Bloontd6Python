@@ -24,6 +24,7 @@ black = (0, 0, 0)
 
 tower_selected = ""
 place_tower = ""
+just_bought = "False"
 
 # Load background
 map = pygame.image.load("images/maps/MonkeyMeadow.png")
@@ -38,6 +39,13 @@ DartMonkeyShopSelect = pygame.transform.scale(DartMonkeyShopSelectbefore, (108, 
 DartMonkeyShop_rect = pygame.Rect(1799, 170, 108, 140)
 DartMonkeybefore = pygame.image.load("images/towers/DartMonkey.png")
 DartMonkey = pygame.transform.scale(DartMonkeybefore, (97, 129))
+RedDartMonkeybefore = pygame.image.load("images/towers/RedDartMonkey.png")
+RedDartMonkey = pygame.transform.scale(RedDartMonkeybefore, (112, 133))
+PlaceDartMonkeybefore = pygame.image.load("images/towers/PlaceDartMonkey.png")
+PlaceDartMonkey = pygame.transform.scale(PlaceDartMonkeybefore, (104, 134))
+
+circle_surf = pygame.Surface((70, 70), pygame.SRCALPHA)  # 35 * 2
+pygame.draw.circle(circle_surf, (255, 0, 0, 80), (35, 35), 35)
 
 def get_cut_corner_rect_points(x, y, w, h, cut):
     return [
@@ -64,8 +72,67 @@ path = [
     (1235, 315),
     (1220, 730),
     (730, 740),
-    (730, 1080),
+    (705, 1080),
 ]
+
+def get_path_block_points(path, radius, spacing=15):
+    block_points = []
+
+    for i in range(len(path) - 1):
+        x1, y1 = path[i]
+        x2, y2 = path[i + 1]
+
+        dx = x2 - x1
+        dy = y2 - y1
+        distance = math.hypot(dx, dy)
+        steps = max(1, int(distance / spacing))
+
+        for step in range(steps + 1):
+            t = step / steps
+            x = x1 + dx * t
+            y = y1 + dy * t
+            block_points.append((x + 35, y + 35))
+
+    return block_points
+
+def is_touching_block_zone(tower_pos, block_zones, block_radius, tower_radius):
+    for x, y in block_zones:
+        dx = tower_pos[0] - x
+        dy = tower_pos[1] - y
+        distance = math.hypot(dx, dy)
+        if distance < block_radius + tower_radius:
+            return True  # Overlapping
+    return False
+
+block_zones = get_path_block_points(path, radius=35, spacing=15)
+
+class Tower:
+    def __init__(self, name, x, y, image_path, range_radius=100):
+        self.name = name
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image, (97, 129))
+        self.rect = self.image.get_rect(center=(x, y))
+        self.range_radius = range_radius
+        self.selected = False
+
+    def draw(self, surface):
+        # Draw range circle if selected
+        if self.selected:
+            pygame.draw.circle(surface, (0, 255, 0, 60), (self.x, self.y), self.range_radius, width=2)
+
+        # Draw tower image
+        surface.blit(self.image, self.rect.topleft)
+
+    def is_hovered(self, mouse_pos):
+        return self.rect.collidepoint(mouse_pos)
+
+    def is_clicked(self, mouse_pos):
+        return self.rect.collidepoint(mouse_pos)
+
+    def set_selected(self, state):
+        self.selected = state
 
 class RedBloon:
     def __init__(self, image_path, x, y, speed, path):
@@ -99,28 +166,37 @@ class RedBloon:
 
 # Start at the first path point
 start_x, start_y = path[0]
-bloon = RedBloon("images/bloons/redbloon.png", start_x, start_y, speed=2, path=path)
+bloons = [RedBloon("images/bloons/redbloon.png", start_x, start_y, speed=2, path=path)]
+towers = []
 
 # Main game loop
 while True:
+    mouse_pos = pygame.mouse.get_pos()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
             
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if place_tower == "Dart Monkey":
-                print("hi")
+            if not is_touching_block_zone(mouse_pos, block_zones, block_radius=35, tower_radius=30):
+                if mouse_pos[0] < 1670 and place_tower == "Dart Monkey":
+                    towers.append(Tower("Dart Monkey", mouse_pos[0], mouse_pos[1], "images/towers/DartMonkey.png",100))
+                place_tower = ""
+            if just_bought: 
+                just_bought = False
             if DartMonkeyShop_rect.collidepoint(event.pos):
                 tower_selected = "Dart Monkey"
-                place_tower = "Dart Monkey"
+                just_bought = True
     
-    mouse_pos = pygame.mouse.get_pos()
-
-    bloon.follow_path()
-
     screen.blit(map, (0, 0))
-    bloon.draw(screen)
+
+    for bloon in bloons:
+        bloon.follow_path()
+        bloon.draw(screen)
+    
+    for tower in towers:
+        tower.draw(screen)
 
     pygame.draw.rect(screen, darkbrown, pygame.Rect(1673, -10, 260, 1100).inflate(5 * 2, 5 * 2), border_radius=35)
 
@@ -138,7 +214,10 @@ while True:
     pygame.draw.rect(screen, brown3, pygame.Rect(1686, 172, 220, 738))
 
     screen.blit(DartMonkeyShop, (1685, 170))
-    
+
+    # for x, y in block_zones:
+    #     screen.blit(circle_surf, (x - 35, y - 35))
+
     if tower_selected == "Dart Monkey":
         screen.blit(DartMonkeyShopSelect, (1801, 171))
     else:
@@ -148,7 +227,21 @@ while True:
         else: 
             screen.blit(DartMonkeyShop, (1799, 170))
 
+    if just_bought and mouse_pos[0] < 1677:
+        place_tower = tower_selected
+        just_bought = False
     
+    if place_tower != "":
+        if mouse_pos[0] > 1677 or mouse_pos[0] < 1 or mouse_pos[1] < 1 or mouse_pos[1] > 1078:
+            place_tower = ""
+        
+        if place_tower == "Dart Monkey":
+            if is_touching_block_zone(mouse_pos, block_zones, block_radius=35, tower_radius=30):
+                screen.blit(RedDartMonkey, (mouse_pos[0] - DartMonkey.get_width() / 2, mouse_pos[1] - DartMonkey.get_height() / 2))
+            else:
+                screen.blit(PlaceDartMonkey, (mouse_pos[0] - DartMonkey.get_width() / 2, mouse_pos[1] - DartMonkey.get_height() / 2))
+    
+    # print(mouse_pos)
 
 
     pygame.display.update()
