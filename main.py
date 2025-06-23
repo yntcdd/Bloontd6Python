@@ -62,18 +62,26 @@ def get_cut_corner_rect_points(x, y, w, h, cut):
 path = [
     (-49, 400),
     (800, 400),
+    (820, 275),
     (800, 150),
     (525, 150),
-    (525, 815),
-    (250, 815),
+    (530, 790),
+    (380, 825),
+    (250, 790),
     (250, 575),
-    (1025, 575),
+    (930, 575),
+    (1030, 535),
     (1050, 315),
     (1235, 315),
+    (1250, 520),
     (1220, 730),
     (730, 740),
-    (705, 1080),
+    (715, 1080),
 ]
+
+def get_hitbox(mousex, mousey, tower):
+    if tower == "Dart Monkey":
+        return pygame.Rect(mousex - 97 / 3.2, mousey - 129 / 8, 97 / 1.6, 129 / 2.1)
 
 def get_path_block_points(path, radius, spacing=15):
     block_points = []
@@ -97,19 +105,20 @@ def get_path_block_points(path, radius, spacing=15):
 
 def is_touching_block_zone(mouse_pos, block_zones, towers, block_width=60, block_height=60, tower_width=60, tower_height=60):
     # Create a rect at the mouse position (for the new tower being placed)
-    if place_tower == "Dart Monkey":
-        new_rect = pygame.Rect(
-            mouse_pos[0] - 97 / 4,
-            mouse_pos[1] - 129 / 6,
-            tower_width / 2,
-            tower_height / 2
-        )
+    # if place_tower == "Dart Monkey":
+    #     new_rect = pygame.Rect(
+    #         mouse_pos[0] - 97 / 4,
+    #         mouse_pos[1] - 129 / 6,
+    #         97 / 2,
+    #         129 / 2
+    #     )
+    new_rect = get_hitbox(mouse_pos[0], mouse_pos[1], place_tower)
 
     # Check collision with block zones (assuming block_zones is list of (x, y) centers)
     for x, y in block_zones:
         block_rect = pygame.Rect(
-            x - block_width // 2,
-            y - block_height // 2,
+            x - block_width // 2 - 15,
+            y - block_height // 2 + 20,
             block_width,
             block_height
         )
@@ -127,20 +136,16 @@ def is_touching_block_zone(mouse_pos, block_zones, towers, block_width=60, block
 block_zones = get_path_block_points(path, radius=35, spacing=15)
 
 class Hitbox:
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, name):
         # x and y represent the center
         self.x = x
         self.y = y
         self.width = width
         self.height = height
+        self.name = name
 
     def get_rect(self):
-        return pygame.Rect(
-            self.x - self.width / 4,
-            self.y - self.width / 6,
-            self.width / 2,
-            self.height / 2
-        )
+        return get_hitbox(self.x, self.y, self.name)
 
     def is_colliding(self, other_rect):
         return self.get_rect().colliderect(other_rect)
@@ -161,7 +166,7 @@ class Tower:
         self.range_radius = range_radius
         self.selected = False
         self.id = towerID
-        self.hitbox = Hitbox(x, y, width, height)
+        self.hitbox = Hitbox(x, y, width, height, name)
 
     def draw(self, surface):
         # Draw range circle if selected
@@ -262,7 +267,7 @@ while True:
     screen.blit(DartMonkeyShop, (1685, 170))
 
     # for x, y in block_zones:
-    #     screen.blit(circle_surf, (x - 35, y - 35))
+    #     screen.blit(circle_surf, (x - 35 - 15, y - 35 + 20))
 
     if tower_selected == "Dart Monkey":
         screen.blit(DartMonkeyShopSelect, (1801, 171))
