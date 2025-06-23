@@ -145,7 +145,12 @@ class Hitbox:
         self.name = name
 
     def get_rect(self):
-        return get_hitbox(self.x, self.y, self.name)
+        return pygame.Rect(
+            self.x - self.width / 4,
+            self.y - self.width / 6,
+            self.width / 2,
+            self.height / 2
+        )
 
     def is_colliding(self, other_rect):
         return self.get_rect().colliderect(other_rect)
