@@ -81,7 +81,7 @@ path = [
 
 def get_hitbox(mousex, mousey, tower):
     if tower == "Dart Monkey":
-        return pygame.Rect(mousex - 97 / 4, mousey - 129 / 6, 97 / 2, 129/ 2)
+        return pygame.Rect(mousex - 97 / 3.2, mousey - 129 / 8, 97 / 1.6, 129 / 2.1)
 
 def get_path_block_points(path, radius, spacing=15):
     block_points = []
