@@ -145,7 +145,7 @@ class Hitbox:
         self.name = name
 
     def get_rect(self):
-        return get_hitbox(mouse_pos[0], mouse_pos[1], self.name)
+        return get_hitbox(self.x, self.y, self.name)
 
     def is_colliding(self, other_rect):
         return self.get_rect().colliderect(other_rect)
