@@ -104,14 +104,6 @@ def get_path_block_points(path, radius, spacing=15):
     return block_points
 
 def is_touching_block_zone(mouse_pos, block_zones, towers, block_width=60, block_height=60, tower_width=60, tower_height=60):
-    # Create a rect at the mouse position (for the new tower being placed)
-    # if place_tower == "Dart Monkey":
-    #     new_rect = pygame.Rect(
-    #         mouse_pos[0] - 97 / 4,
-    #         mouse_pos[1] - 129 / 6,
-    #         97 / 2,
-    #         129 / 2
-    #     )
     new_rect = get_hitbox(mouse_pos[0], mouse_pos[1], place_tower)
 
     # Check collision with block zones (assuming block_zones is list of (x, y) centers)
@@ -130,7 +122,7 @@ def is_touching_block_zone(mouse_pos, block_zones, towers, block_width=60, block
         if tower.hitbox.get_rect().colliderect(new_rect):
             return True
 
-    return False  # No collision
+    return False
 
 
 block_zones = get_path_block_points(path, radius=35, spacing=15)
