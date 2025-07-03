@@ -208,6 +208,7 @@ class RedBloon:
 start_x, start_y = path[0]
 bloons = [RedBloon("images/bloons/redbloon.png", start_x, start_y, speed=2, path=path)]
 towers = []
+rounds = [[[20, 'red', 17.51, 20]]]
 
 # Main game loop
 while True:
@@ -232,12 +233,16 @@ while True:
     
     screen.blit(map, (0, 0))
 
+    combined = bloons + towers
+    combined.sort(key=lambda obj: obj.y)
+    
+    for obj in combined:
+        obj.draw(screen)
+
     for bloon in bloons:
         bloon.follow_path()
-        bloon.draw(screen)
 
     for tower in sorted(towers, key=lambda t: t.y):
-        tower.draw(screen)
         tower.hitbox.draw(screen)
         
 
@@ -283,9 +288,6 @@ while True:
                 screen.blit(RedDartMonkey, (mouse_pos[0] - DartMonkey.get_width() / 2, mouse_pos[1] - DartMonkey.get_height() / 2))
             else:
                 screen.blit(PlaceDartMonkey, (mouse_pos[0] - DartMonkey.get_width() / 2, mouse_pos[1] - DartMonkey.get_height() / 2))
-    
-    # print(mouse_pos)
-
 
     pygame.display.update()
     clock.tick(60)
