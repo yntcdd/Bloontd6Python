@@ -124,7 +124,6 @@ def is_touching_block_zone(mouse_pos, block_zones, towers, block_width=60, block
 
     return False
 
-
 block_zones = get_path_block_points(path, radius=35, spacing=15)
 
 class Hitbox:
